@@ -1,0 +1,39 @@
+c Slang -- A simple scripting language
+c Copyright (C) 2024  Butterroach
+c
+c This program is free software: you can redistribute it and/or modify
+c it under the terms of the GNU Affero General Public License as published
+c by the Free Software Foundation, either version 3 of the License, or
+c (at your option) any later version.
+c
+c This program is distributed in the hope that it will be useful,
+c but WITHOUT ANY WARRANTY; without even the implied warranty of
+c MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+c GNU Affero General Public License for more details.
+c You should have received a copy of the GNU Affero General Public License
+c along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+var int x 3
+var int y 5
+var float v 64
+var float w 64.1
+var str a "Hello"
+var str b ", "
+var str c "World!"
+var fun outhw con $a $c
+var fun out1 add $x $y
+var fun out2 mul $v $w
+print $outhw
+print $out1
+print $out2
+var int x 19
+var float y .73
+var fun out1 sin $x
+var fun out2 cos $x
+var fun out3 asin $y
+var fun out4 acos $y
+print $out1
+print $out2
+print $out3
+print $out4
+print "i dont remember if i can \"do\" this"

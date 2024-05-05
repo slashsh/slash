@@ -3,21 +3,22 @@
     Copyright (C) 2024  Butterroach
 
     This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
+    it under the terms of the GNU Affero General Public License as published
+    by the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+    GNU Affero General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
+    You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import math
 import re
+import sys
 from typing import Callable  # I LOVE TYPE HINTING I LOVE TYPE HINTING YES YES
 
 
@@ -136,36 +137,8 @@ functions = [
     ),
     ("asin", slang_asin, "Calculates the arc sine."),
     ("acos", slang_acos, "Calculates the arc cosine."),
+    ("c", lambda *x:None, "Comment"),
 ]
 
-if __name__ == "__main__":
+if __name__ == "__main__" and len(sys.argv) < 2:
 
-    code = """
-var int x 3
-var int y 5
-var float v 64
-var float w 64.1
-var str a "Hello"
-var str b ", "
-var str c "World!"
-var fun outhw con $a $c
-var fun out1 add $x $y
-var fun out2 mul $v $w
-print $outhw
-print $out1
-print $out2
-var int x 19
-var float y .73
-var fun out1 sin $x
-var fun out2 cos $x
-var fun out3 asin $y
-var fun out4 acos $y
-print $out1
-print $out2
-print $out3
-print $out4
-    """
-
-    print("\n\n === START OF CODE === \n\n")
-    output = process_function_calls(code, functions)
-    print(output)

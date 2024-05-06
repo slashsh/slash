@@ -202,6 +202,10 @@ functions = [
         slang_exit,
         "Exits the program. The function itself needs an exit code, but you can still type in no exit code because of how this stupid thing works.",
     ),
+    (
+        "#",
+        lambda *x: None,
+    ),
 ]
 
 if __name__ == "__main__" and (

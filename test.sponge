@@ -19,8 +19,9 @@ var float v 64
 var float w 64.1
 var str a "Hello"
 var str b ", "
-var str c "World!"
-var fun outhw con $a $c
+var str c "world!"
+var fun outhw con $a $b 
+var fun outhw con $outhw $c
 var fun out1 add $x $y
 var fun out2 mul $v $w
 print $outhw

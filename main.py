@@ -86,7 +86,7 @@ def process_single_line(
         # print("checking line for functions")
         if line.startswith(function_name):
             # print("function found!", function_name)
-            args: list[str] = split_args(line.replace(f"{function_name} ", ""))
+            args: list[str] = split_args(line.replace(f"{function_name} ", "", 1))
             internalfunction = functions[i][1]
             # print("converting args to correct types")
             restannotate = None
@@ -96,7 +96,7 @@ def process_single_line(
                 internalfunction.__annotations__.values(),
                 inspect.signature(internalfunction).parameters.values(),
             ):
-                print(i, annotate, argname)
+                # print(i, annotate, argname)
                 if args[i].startswith("$"):
                     args[i] = slang_vars.get(args[i].replace("$", ""))
                 args[i] = annotate(args[i])
@@ -107,7 +107,7 @@ def process_single_line(
             if restannotate is not None:
                 for i, annotate in enumerate(unannotatedargs):
                     if args[i].startswith("$"):
-                        args[i] = slang_vars.get(args[i].replace("$", ""))
+                        args[i] = slang_vars.get(args[i].replace("$", "", 1))
                     args[i] = restannotate(args[i])
             out = internalfunction(*args)
             # print(out)
@@ -151,8 +151,8 @@ def slang_acos(x: float):
     return math.acos(x)
 
 
-def con(*strs: str):
-    return "".join(strs)
+def con(str1: str, str2: str):
+    return "".join([str1, str2])
 
 
 def slang_exit(code: int):
@@ -193,7 +193,7 @@ functions = [
     (
         "con",
         con,
-        "Concatenates strings together (can take an infinite number of arguments).",
+        "Concatenates 2 strings together.",
     ),
     ("asin", slang_asin, "Calculates the arc sine."),
     ("acos", slang_acos, "Calculates the arc cosine."),

@@ -16,45 +16,101 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import itertools
 import math
-import re
+import os
 import sys
+import inspect
 from typing import Callable  # I LOVE TYPE HINTING I LOVE TYPE HINTING YES YES
+
+os.system("")
+
+
+def split_args(text):
+    words = []
+    current_word = ""
+    in_quotes = False
+    escape_next = False
+
+    for char in text:
+        if char == "\\":
+            if escape_next:
+                current_word += char
+                escape_next = False
+            else:
+                escape_next = True
+        elif char == '"':
+            if escape_next:
+                current_word += char
+                escape_next = False
+            elif in_quotes:
+                if current_word:
+                    words.append(current_word)
+                current_word = ""
+                in_quotes = False
+            else:
+                in_quotes = True
+        elif char == " ":
+            if in_quotes:
+                current_word += char
+            elif current_word:
+                words.append(current_word.strip('"'))
+                current_word = ""
+        else:
+            current_word += char
+
+    if current_word:
+        words.append(current_word.strip('"'))
+
+    words = [word.replace("\\\\", "\\") for word in words]
+
+    return words
 
 
 def process_function_calls(code: str, functions: list[tuple[str, Callable]]):
     function_names = [function[0] for function in functions]
-    out = ""
     for line in code.splitlines():
         lout = process_single_line(line, function_names, functions)
-        out += lout + "\n" if lout is not None else ""
-    return out
+        if lout != None:
+            print(lout)
 
 
 def process_single_line(
     line: str, function_names: list[str], functions: list[tuple[str, Callable]]
 ):
+    # TODO this fucking btich
     # print("reading line")
+    if line == "exit":
+        os._exit(0)
     for i, function_name in enumerate(function_names):
         # print("checking line for functions")
         if line.startswith(function_name):
             # print("function found!", function_name)
-            args: list[str] = [
-                group[0] if group[0] else group[1] if group[1] else group[2]
-                for group in re.findall(
-                    r'"([^"]*)"|\'([^\']*)\'|(\S+)',
-                    line.replace(f"{function_name} ", ""),
-                )
-            ]  # TODO HEL;P WHAT IS THIS
+            args: list[str] = split_args(line.replace(f"{function_name} ", ""))
             internalfunction = functions[i][1]
             # print("converting args to correct types")
-            for i, annotate in enumerate(internalfunction.__annotations__.values()):
+            restannotate = None
+            unannotatedargs = args.copy()
+            for i, annotate, argname in zip(
+                range(len(internalfunction.__annotations__.values())),
+                internalfunction.__annotations__.values(),
+                inspect.signature(internalfunction).parameters.values(),
+            ):
+                print(i, annotate, argname)
                 if args[i].startswith("$"):
                     args[i] = slang_vars.get(args[i].replace("$", ""))
                 args[i] = annotate(args[i])
+                unannotatedargs.pop(0)
+                if str(argname).startswith("*"):
+                    restannotate = annotate
                 # print(f"converted to {type(args[i])} successfully!")
+            if restannotate is not None:
+                for i, annotate in enumerate(unannotatedargs):
+                    if args[i].startswith("$"):
+                        args[i] = slang_vars.get(args[i].replace("$", ""))
+                    args[i] = restannotate(args[i])
             out = internalfunction(*args)
-            # print(out) # ! debug make it not print when finished
+            # print(out)
             return out
 
 
@@ -74,7 +130,7 @@ def divide(x: float, y: float):
     return x / y
 
 
-def slang_print(prints: str):
+def slang_print(prints: str = ""):
     return prints
 
 
@@ -97,6 +153,10 @@ def slang_acos(x: float):
 
 def con(*strs: str):
     return "".join(strs)
+
+
+def slang_exit(code: int):
+    os._exit(code)
 
 
 def define_var_str(var_name: str, var_value: str):
@@ -137,8 +197,46 @@ functions = [
     ),
     ("asin", slang_asin, "Calculates the arc sine."),
     ("acos", slang_acos, "Calculates the arc cosine."),
-    ("c", lambda *x:None, "Comment"),
+    (
+        "exit",
+        slang_exit,
+        "Exits the program. The function itself needs an exit code, but you can still type in no exit code because of how this stupid thing works.",
+    ),
 ]
 
-if __name__ == "__main__" and len(sys.argv) < 2:
+if __name__ == "__main__" and (
+    len(sys.argv) < 2
+    or (
+        len(sys.argv) == 2
+        and (sys.argv[1] in ("--shh", "-s") if len(sys.argv) > 1 else True)
+    )
+):
+    if "--shh" not in sys.argv and "-s" not in sys.argv:
+        print("Slang v2.0.0")
+        print()
+        print(
+            "This program is licensed under the GNU AGPL-v3 license, which is stupid."
+        )
+        print(
+            "I originally had this as part of a GNU AGPL licensed project, but now I wanna make it an independant thing and the GPL isn't compatible with AGPL,"
+        )
+        print(
+            "so I need to license the new thing under the AGPL. This isn't meant to be used on a server now. Please don't use this on a server."
+        )
+        print(
+            "You should have received a copy of the GNU Affero General Public License along with this program. If not, see https://www.gnu.org/licenses/"
+        )
+        print(
+            "You can use the --shh (or -s) argument to make this not appear when you start the interactive shell."
+        )
+        print()
+    while True:
+        code = input(">")
+        try:
+            process_function_calls(code, functions)
+        except Exception as e:
+            print(f"\u001b[31mUH OH! PYTHON ERROR!\t{type(e).__name__}: {e}\u001b[0m")
 
+if __name__ == "__main__" and len(sys.argv) > 1:
+    with open(sys.argv[1], "r") as f:
+        process_function_calls(f.read(), functions)

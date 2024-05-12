@@ -223,9 +223,16 @@ functions = [
         slang_exit,
         "Exits the program. The function itself needs an exit code, but you can still type in no exit code because of how this stupid thing works.",
     ),
+    ("#", lambda *x: None, "it's a comment......."),
     (
-        "#",
-        lambda *x: None,
+        "exec_py",
+        lambda x: exec(x),
+        "Executes Python code using Python's built-in exec.",
+    ),
+    (
+        "eval_py",
+        lambda x: eval(x),
+        "Evaluates a Python expression using Python's built-in eval.",
     ),
 ]
 
@@ -244,16 +251,10 @@ if __name__ == "__main__" and (
     )
 ):
     if "--shh" not in sys.argv and "-s" not in sys.argv:
-        print("Slang v2.0.0")
+        print("Slang v2.0.0alpha")
         print()
         print(
-            "This program is licensed under the GNU AGPL-v3 license, which is stupid."
-        )
-        print(
-            "I originally had this as part of a GNU AGPL licensed project, but now I wanna make it an independant thing and the GPL isn't compatible with AGPL,"
-        )
-        print(
-            "so I need to license the new thing under the AGPL. This isn't meant to be used on a server now. Please don't use this on a server."
+            "This program is licensed under the GNU AGPL-v3 license (apparently I can't put it under the GPL now)."
         )
         print(
             "You should have received a copy of the GNU Affero General Public License along with this program. If not, see https://www.gnu.org/licenses/"

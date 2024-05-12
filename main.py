@@ -83,6 +83,7 @@ def process_function_calls(code: str, functions: list[tuple[str, Callable]]):
     function_names = [function[0] for function in functions]
     for line in code.splitlines():
         if not line.split():
+            linec += 1
             continue
         lout = process_single_line(line, function_names, functions)
         if lout != None:

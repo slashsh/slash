@@ -16,7 +16,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
-import itertools
 import math
 import os
 import sys
@@ -24,6 +23,18 @@ import inspect
 from typing import Callable  # I LOVE TYPE HINTING I LOVE TYPE HINTING YES YES
 
 os.system("")
+
+linec = 0
+
+
+class SlangError(Exception):
+    pass
+
+
+class NoSuchFunction(SlangError):
+    """
+    [msg] function does not exist
+    """
 
 
 def split_args(text):
@@ -68,23 +79,30 @@ def split_args(text):
 
 
 def process_function_calls(code: str, functions: list[tuple[str, Callable]]):
+    global linec
     function_names = [function[0] for function in functions]
     for line in code.splitlines():
+        if not line.split():
+            continue
         lout = process_single_line(line, function_names, functions)
         if lout != None:
             print(lout)
+        linec += 1
 
 
 def process_single_line(
     line: str, function_names: list[str], functions: list[tuple[str, Callable]]
 ):
     # TODO this fucking btich
+    # ^ i dont remember what this is about and im too scared to touch that todo
     # print("reading line")
     if line == "exit":
         os._exit(0)
+    wompwomp = True
     for i, function_name in enumerate(function_names):
         # print("checking line for functions")
         if line.startswith(function_name):
+            wompwomp = False
             # print("function found!", function_name)
             args: list[str] = split_args(line.replace(f"{function_name} ", "", 1))
             internalfunction = functions[i][1]
@@ -112,6 +130,8 @@ def process_single_line(
             out = internalfunction(*args)
             # print(out)
             return out
+    if wompwomp:
+        raise NoSuchFunction(line.split(" ")[0])
 
 
 def add(x: float, y: float):
@@ -208,6 +228,13 @@ functions = [
     ),
 ]
 
+
+def replace_error_msg(e: SlangError, code: str):
+    if isinstance(e, NoSuchFunction):
+        return type(e).__doc__.replace("[msg]", code.split()[0])
+    return type(e).__doc__
+
+
 if __name__ == "__main__" and (
     len(sys.argv) < 2
     or (
@@ -238,9 +265,25 @@ if __name__ == "__main__" and (
         code = input(">")
         try:
             process_function_calls(code, functions)
+        except SlangError as e:
+            print(code)
+            print(f"\u001b[31mERROR! {replace_error_msg(e, code)}\u001b[0m")
         except Exception as e:
             print(f"\u001b[31mUH OH! PYTHON ERROR!\t{type(e).__name__}: {e}\u001b[0m")
 
 if __name__ == "__main__" and len(sys.argv) > 1:
-    with open(sys.argv[1], "r") as f:
-        process_function_calls(f.read(), functions)
+    try:
+        with open(sys.argv[1], "r") as f:
+            fread = f.read()
+    except FileNotFoundError:
+        print("that file doesn't exist dumbass")
+        os._exit(1)
+    try:
+        process_function_calls(fread, functions)
+    except SlangError as e:
+        print(
+            f"\u001b[1m\u001b[31mLINE {linec+1}: \u001b[0m\u001b[4m\u001b[32m{fread.splitlines()[linec]}\u001b[0m"
+        )
+        print(
+            f"\u001b[1m\u001b[31mERROR! {replace_error_msg(e, fread.splitlines()[linec])}\u001b[0m"
+        )

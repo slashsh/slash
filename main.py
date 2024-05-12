@@ -26,6 +26,8 @@ os.system("")
 
 linec = 0
 
+__version__ = "2.0.0-alpha"
+
 
 class SlangError(Exception):
     pass
@@ -251,7 +253,7 @@ if __name__ == "__main__" and (
     )
 ):
     if "--shh" not in sys.argv and "-s" not in sys.argv:
-        print("Slang v2.0.0alpha")
+        print(f"Slang v{__version__}")
         print()
         print(
             "This program is licensed under the GNU AGPL-v3 license (apparently I can't put it under the GPL now)."

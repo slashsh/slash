@@ -138,7 +138,6 @@ def process_single_line(
             if restannotate is not None:
                 i = 0
                 for _ in unannotatedargs:
-                    print(i, unannotatedargs[i], unannotatedargs)
                     args.remove(unannotatedargs[i])
                     if unannotatedargs[i].startswith("$"):
                         orig_var = unannotatedargs[i]

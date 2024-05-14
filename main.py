@@ -124,6 +124,9 @@ def process_single_line(
                 inspect.signature(internalfunction).parameters.values(),
             ):
                 # print(i, annotate, argname)
+                if str(argname).startswith("*"):
+                    restannotate = annotate
+                    break
                 if args[i].startswith("$"):
                     orig_var = args[i]
                     args[i] = slang_vars.get(args[i].replace("$", ""))
@@ -131,17 +134,24 @@ def process_single_line(
                         raise NoSuchVariable(orig_var)
                 args[i] = annotate(args[i])
                 unannotatedargs.pop(0)
-                if str(argname).startswith("*"):
-                    restannotate = annotate
                 # print(f"converted to {type(args[i])} successfully!")
             if restannotate is not None:
-                for i, annotate in enumerate(unannotatedargs):
-                    if args[i].startswith("$"):
-                        args[i] = slang_vars.get(args[i].replace("$", "", 1))
-                    args[i] = restannotate(args[i])
-            out = internalfunction(*args)
-            # print(out)
-            return out
+                i = 0
+                for _ in unannotatedargs:
+                    print(i, unannotatedargs[i], unannotatedargs)
+                    args.remove(unannotatedargs[i])
+                    if unannotatedargs[i].startswith("$"):
+                        orig_var = unannotatedargs[i]
+                        unannotatedargs[i] = slang_vars.get(
+                            unannotatedargs[i].replace("$", "")
+                        )
+                        if unannotatedargs[i] is None:
+                            raise NoSuchVariable(orig_var)
+                    unannotatedargs[i] = restannotate(unannotatedargs[i])
+                    i += 1
+            if unannotatedargs and args != unannotatedargs:  # how does this even happen
+                return internalfunction(*(args + unannotatedargs))
+            return internalfunction(*args)
     if wompwomp:
         raise NoSuchFunction(line.split(" ")[0])
 
@@ -183,8 +193,8 @@ def slang_acos(x: float):
     return math.acos(x)
 
 
-def con(str1: str, str2: str):
-    return "".join([str1, str2])
+def con(*str1: str):
+    return "".join(str1)
 
 
 def slang_exit(code: int):
@@ -280,7 +290,8 @@ if __name__ == "__main__" and (
             print(code)
             print(f"\u001b[31mERROR! {replace_error_msg(e, code)}\u001b[0m")
         except Exception as e:
-            print(f"\u001b[31mUH OH! PYTHON ERROR!\t{type(e).__name__}: {e}\u001b[0m")
+            # print(f"\u001b[31mUH OH! PYTHON ERROR!\t{type(e).__name__}: {e}\u001b[0m")
+            raise e
 
 if __name__ == "__main__" and len(sys.argv) > 1:
     try:

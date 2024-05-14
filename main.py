@@ -39,6 +39,12 @@ class NoSuchFunction(SlangError):
     """
 
 
+class NoSuchVariable(SlangError):
+    """
+    No variable named [msg]
+    """
+
+
 def split_args(text):
     words = []
     current_word = ""
@@ -119,7 +125,10 @@ def process_single_line(
             ):
                 # print(i, annotate, argname)
                 if args[i].startswith("$"):
+                    orig_var = args[i]
                     args[i] = slang_vars.get(args[i].replace("$", ""))
+                    if args[i] is None:
+                        raise NoSuchVariable(orig_var)
                 args[i] = annotate(args[i])
                 unannotatedargs.pop(0)
                 if str(argname).startswith("*"):
@@ -240,9 +249,7 @@ functions = [
 
 
 def replace_error_msg(e: SlangError, code: str):
-    if isinstance(e, NoSuchFunction):
-        return type(e).__doc__.replace("[msg]", code.split()[0])
-    return type(e).__doc__
+    return type(e).__doc__.replace("[msg]", str(e))
 
 
 if __name__ == "__main__" and (

@@ -240,7 +240,8 @@ functions = [
         "con2",
         lambda str1, str2: "".join([str1, str2]),
         "Like con, but only takes 2 strings. Shouldn't have any of the bugs.",
-    )("asin", slang_asin, "Calculates the arc sine."),
+    ),
+    ("asin", slang_asin, "Calculates the arc sine."),
     ("acos", slang_acos, "Calculates the arc cosine."),
     (
         "exit",

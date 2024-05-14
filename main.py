@@ -236,7 +236,11 @@ functions = [
         con,
         "Concatenates an infinite amount of strings together. For some fucking reason a bug exists that makes this ignore spaces in variables i fucking hate doing this.",
     ),
-    ("asin", slang_asin, "Calculates the arc sine."),
+    (
+        "con2",
+        lambda str1, str2: "".join([str1, str2]),
+        "Like con, but only takes 2 strings. Shouldn't have any of the bugs.",
+    )("asin", slang_asin, "Calculates the arc sine."),
     ("acos", slang_acos, "Calculates the arc cosine."),
     (
         "exit",

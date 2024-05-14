@@ -234,7 +234,7 @@ functions = [
     (
         "con",
         con,
-        "Concatenates 2 strings together.",
+        "Concatenates an infinite amount of strings together. For some fucking reason a bug exists that makes this ignore spaces in variables i fucking hate doing this.",
     ),
     ("asin", slang_asin, "Calculates the arc sine."),
     ("acos", slang_acos, "Calculates the arc cosine."),

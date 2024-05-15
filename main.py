@@ -16,17 +16,19 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import inspect
+import json
 import math
 import os
 import sys
-import inspect
+import urllib.request
 from typing import Callable  # I LOVE TYPE HINTING I LOVE TYPE HINTING YES YES
 
 os.system("")
 
 linec = 0
 
-__version__ = "2.0.0-alpha"
+__version__ = "2.1.0-alpha"
 
 
 class SlangError(Exception):
@@ -248,7 +250,7 @@ functions = [
         slang_exit,
         "Exits the program. The function itself needs an exit code, but you can still type in no exit code because of how this stupid thing works.",
     ),
-    ("#", lambda *x: None, "it's a comment......."),
+    ("#", lambda *x: None),
     (
         "exec_py",
         lambda x: exec(x),
@@ -264,6 +266,23 @@ functions = [
 
 def replace_error_msg(e: SlangError, code: str):
     return type(e).__doc__.replace("[msg]", str(e))
+
+
+if __name__ == "__main__":
+    # probably good enough checker
+    # i didnt use requests because i grinded too hard on the zero dependency setup i cant lose it now
+    try:
+        with urllib.request.urlopen(
+            "https://api.github.com/repos/Butterroach/slang/releases/latest"
+        ) as resp:
+            data = resp.read().decode("utf-8")
+            release_data = json.loads(data)
+            latest_ver = release_data["tag_name"]
+            if __version__ != latest_ver:
+                print(f"There's a new version ({latest_ver}) available for Slang!")
+                print(f"You're currently on {__version__}. Please update.")
+    except Exception as e:
+        print("uh oh!", f"{type(e).__name__}: {e}")
 
 
 if __name__ == "__main__" and (
@@ -296,6 +315,40 @@ if __name__ == "__main__" and (
         except Exception as e:
             # print(f"\u001b[31mUH OH! PYTHON ERROR!\t{type(e).__name__}: {e}\u001b[0m")
             raise e
+
+
+if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "help":
+    print(f"Slang v{__version__}\n")
+    if len(sys.argv) < 3:
+        print("Slang is a simple scripting language written in Python by Butterroach.")
+        print(
+            "See the wiki at https://github.com/Butterroach/slang/wiki for more info.\n"
+        )
+        print("All Slang built-in functions and descriptions:\n")
+        for func in functions:
+            if len(func) == 3:
+                print(f"{func[0]}: {func[2]}")
+    else:
+        nya = [func[0] for func in functions]
+        if sys.argv[2] not in nya:
+            print("That's not a built-in function!")
+            os._exit(2)
+        i = nya.index(sys.argv[2])
+        print(nya[i], end=": ")
+        if len(functions[i]) != 3:
+            if nya[i].startswith("var"):
+                print("I'm pretty sure you'd know what that is?")
+                os._exit(0)
+            if nya[i] == "#":
+                print(
+                    "...Y'know, that's a comment... How'd you figure out that was a function anyway?"
+                )
+                os._exit(0)
+            print("This function doesn't have a description.")
+            os._exit(0)
+        print(functions[i][2])
+    os._exit(0)
+
 
 if __name__ == "__main__" and len(sys.argv) > 1:
     try:

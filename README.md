@@ -32,7 +32,7 @@ Open a PR. If you don't know how to do that uhhhhh
 
 ### How do I update?
 
-[Read the first 2 sentences](#how-to-use). Check yourself. Soon I'll make it tell you if there's an update.
+[Read the first 2 sentences](#how-to-use). Slang will tell you if there's an update if you have internet and GitHub is up and isn't blocked.
 
 ### Conclusion
 

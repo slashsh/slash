@@ -282,7 +282,7 @@ if __name__ == "__main__":
                 print(f"There's a new version ({latest_ver}) available for Slang!")
                 print(f"You're currently on {__version__}. Please update.")
     except Exception as e:
-        print("uh oh!", f"{type(e).__name__}: {e}")
+        pass
 
 
 if __name__ == "__main__" and (

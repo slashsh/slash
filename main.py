@@ -268,7 +268,11 @@ functions = [
         lambda x: eval(x),
         "Evaluates a Python expression using Python's built-in eval.",
     ),
-    ("penis", penis, "GRAAAAAAAHHHHH ONLY SE STR PLASE LR ELSE I WILL KILL YOUPLEAS DONT EJIN THE TUN"),
+    (
+        "penis",
+        penis,
+        "GRAAAAAAAHHHHH ONLY SE STR PLASE LR ELSE I WILL KILL YOUPLEAS DONT EJIN THE TUN",
+    ),
 ]
 
 

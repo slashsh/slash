@@ -28,7 +28,7 @@ os.system("")
 
 linec = 0
 
-__version__ = "2.1.0-alpha"
+__version__ = "2.2.0-alpha"
 
 
 class SlangError(Exception):
@@ -157,6 +157,13 @@ def process_single_line(
         raise NoSuchFunction(line.split(" ")[0])
 
 
+def penis(string: str):
+    """
+    thank you ocaminty
+    """
+    return "penis"
+
+
 def add(x: float, y: float):
     return x + y
 
@@ -261,6 +268,7 @@ functions = [
         lambda x: eval(x),
         "Evaluates a Python expression using Python's built-in eval.",
     ),
+    ("penis", penis, "GRAAAAAAAHHHHH ONLY SE STR PLASE LR ELSE I WILL KILL YOUPLEAS DONT EJIN THE TUN"),
 ]
 
 

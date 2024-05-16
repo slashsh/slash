@@ -1,3 +1,7 @@
+<p align="center"><img alt="Slang logo" src="https://raw.githubusercontent.com/Butterroach/slang/master/slang.png" /></p>
+
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 # slang
 
 ## a simple scripting language

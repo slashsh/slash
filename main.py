@@ -156,6 +156,9 @@ def process_single_line(
     if wompwomp:
         raise NoSuchFunction(line.split(" ")[0])
 
+def penis(string: string)
+return "penis"
+
 
 def add(x: float, y: float):
     return x + y

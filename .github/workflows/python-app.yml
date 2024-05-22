@@ -5,7 +5,7 @@ name: Python application
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "github-actions-test" ]
   pull_request:
     branches: [ "master" ]
 
@@ -34,3 +34,7 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Try to interpret test.sponge
+      run: |
+        # this is like the pytest part i removed but it should only error if there's an actual issue
+        py main.py test.sponge

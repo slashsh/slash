@@ -251,6 +251,10 @@ def define_var_fun(var_name: str, *var_value: str):
     )
 
 
+def slang_input(msg: str = None):
+    return input(msg)
+
+
 slang_vars = {}
 functions = [
     ("print", slang_print, "Prints output."),
@@ -302,6 +306,11 @@ functions = [
         "penis",
         penis,
         "GRAAAAAAAHHHHH ONLY SE STR PLASE LR ELSE I WILL KILL YOUPLEAS DONT EJIN THE TUN",
+    ),
+    (
+        "input",
+        slang_input,
+        "Reads input from stdin. Can take an argument specifying a message to display to the user.",
     ),
 ]
 

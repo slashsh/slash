@@ -28,7 +28,7 @@ os.system("")
 
 linec = 0
 
-__version__ = "2.2.0-alpha"
+__version__ = "2.3.0-alpha"
 
 
 class SlangError(Exception):
@@ -180,6 +180,30 @@ def divide(x: float, y: float):
     return x / y
 
 
+def power(x: float, y: float):
+    return x**y
+
+
+def bitwise_and(x: int, y: int):
+    return x & y
+
+
+def bitwise_or(x: int, y: int):
+    return x | y
+
+
+def bitwise_xor(x: int, y: int):
+    return x ^ y
+
+
+def bitwise_lshift(x: int, y: int):
+    return x << y
+
+
+def bitwise_rshift(x: int, y: int):
+    return x >> y
+
+
 def slang_print(prints: str = ""):
     return prints
 
@@ -229,15 +253,21 @@ def define_var_fun(var_name: str, *var_value: str):
 
 slang_vars = {}
 functions = [
-    ("add", add, "Adds two numbers."),
-    ("sub", subtract, "Subtracts two numbers."),
-    ("mul", multiply, "Multiplies two numbers."),
-    ("div", divide, "Divides two numbers."),
     ("print", slang_print, "Prints output."),
     ("var str", define_var_str),
     ("var int", define_var_int),
     ("var float", define_var_float),
     ("var fun", define_var_fun),
+    ("add", add, "Adds two numbers."),
+    ("sub", subtract, "Subtracts two numbers."),
+    ("mul", multiply, "Multiplies two numbers."),
+    ("div", divide, "Divides two numbers."),
+    ("pow", power, "Calculates x to the power of y."),
+    ("and", bitwise_and, "Calculates bitwise AND of X and Y."),
+    ("or", bitwise_or, "Calculates bitwise OR of X and Y."),
+    ("xor", bitwise_xor, "Calculates bitwise XOR of X and Y."),
+    ("lsh", bitwise_lshift, "Calculates bitwise LSHIFT of X and Y."),
+    ("rsh", bitwise_rshift, "Calculates bitwise RSHIFT of X and Y."),
     ("sin", slang_sin, "Calculates sine of x radians."),
     ("cos", slang_cos, "Calculates cosine of x radians."),
     (

@@ -40,3 +40,5 @@ print "i dont remember if i can \"do\" this"
 exec_py "print(\"Python code!\")"
 eval_py "print(\"Python expression!\")"
 exec_py "print(\"what the fuck is this -> \\\"\\\\\\\\\\\"\")"
+var fun out pow 2 7
+print $out

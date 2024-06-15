@@ -13,36 +13,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-var int x 3
-var int y 5
-var float v 64
-var float w 64.1
-var str a "Hello"
-var str b ", "
-var str c "world!"
-var fun outhw con $a $b $c
-var fun out1 add $x $y
-var fun out2 mul $v $w
-print $outhw
-print $out1
-print $out2
-var int x 19
-var float y .73
-var fun out1 sin $x
-var fun out2 cos $x
-var fun out3 asin $y
-var fun out4 acos $y
-print $out1
-print $out2
-print $out3
-print $out4
-print "i dont remember if i can \"do\" this"
-exec_py "print(\"Python code!\")"
-eval_py "print(\"Python expression!\")"
-exec_py "print(\"what the fuck is this -> \\\"\\\\\\\\\\\"\")"
-var fun out pow 2 7
-print $out
-
-var int x 1
-print test1
-run "test2.sponge"
+print test3
+print $x
+var int y 91

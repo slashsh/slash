@@ -47,6 +47,27 @@ class NoSuchVariable(SlangError):
     """
 
 
+class FileNotFound(SlangError):
+    """
+    File [msg] doesn't exist
+    """
+
+
+class PermissionDenied(SlangError):
+    """
+    Couldn't do operation on file [msg]
+    """
+
+
+class Teenager(SlangError):
+    """
+    A script can't run itself
+    """
+
+
+fileslines = {}
+
+
 def split_args(text):
     words = []
     current_word = ""
@@ -255,6 +276,33 @@ def slang_input(msg: str = None):
     return input(msg)
 
 
+def run(filename: str):
+    global linec, currentfile, currentfilecons
+    try:
+        with open(filename, "r") as f:
+            slang_code = f.read()
+    except PermissionError:
+        raise PermissionDenied(filename)
+    except FileNotFoundError:
+        raise FileNotFound(filename)
+    fileslines[filename] = 0
+    fileslines[currentfile] = linec
+    prevfile = currentfile
+    currentfile = filename
+    linec = fileslines[filename]
+    prevfilecons = currentfilecons
+    currentfilecons = slang_code
+    try:
+        if slang_code == fread:
+            raise Teenager()
+    except NameError:
+        pass
+    process_function_calls(slang_code, functions)
+    currentfile = prevfile
+    linec = fileslines[currentfile]
+    currentfilecons = prevfilecons
+
+
 slang_vars = {}
 functions = [
     ("print", slang_print, "Prints output."),
@@ -312,6 +360,11 @@ functions = [
         slang_input,
         "Reads input from stdin. Can take an argument specifying a message to display to the user.",
     ),
+    (
+        "run",
+        run,
+        "Runs another Slang file. This can be used for functions AND modules at the same time. Variables are shared, so that's function parameters for ya. 3 birds with one stone.",
+    ),
 ]
 
 
@@ -343,6 +396,7 @@ if __name__ == "__main__" and (
         and (sys.argv[1] in ("--shh", "-s") if len(sys.argv) > 1 else True)
     )
 ):
+    currentfile = "///SHELL"
     if "--shh" not in sys.argv and "-s" not in sys.argv:
         print(f"Slang v{__version__}")
         print()
@@ -364,8 +418,7 @@ if __name__ == "__main__" and (
             print(code)
             print(f"\u001b[31mERROR! {replace_error_msg(e, code)}\u001b[0m")
         except Exception as e:
-            # print(f"\u001b[31mUH OH! PYTHON ERROR!\t{type(e).__name__}: {e}\u001b[0m")
-            raise e
+            print(f"\u001b[31mUH OH! PYTHON ERROR!\t{type(e).__name__}: {e}\u001b[0m")
 
 
 if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "help":
@@ -402,18 +455,20 @@ if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "help":
 
 
 if __name__ == "__main__" and len(sys.argv) > 1:
+    currentfile = sys.argv[1]
     try:
         with open(sys.argv[1], "r") as f:
             fread = f.read()
     except FileNotFoundError:
         print("that file doesn't exist dumbass")
         os._exit(1)
+    currentfilecons = fread
     try:
         process_function_calls(fread, functions)
     except SlangError as e:
         print(
-            f"\u001b[1m\u001b[31mLINE {linec+1}: \u001b[0m\u001b[4m\u001b[32m{fread.splitlines()[linec]}\u001b[0m"
+            f"\u001b[1m\u001b[31mLINE {linec+1} IN {currentfile}: \u001b[0m\u001b[4m\u001b[32m{currentfilecons.splitlines()[linec]}\u001b[0m"
         )
         print(
-            f"\u001b[1m\u001b[31mERROR! {replace_error_msg(e, fread.splitlines()[linec])}\u001b[0m"
+            f"\u001b[1m\u001b[31mERROR! {replace_error_msg(e, currentfilecons.splitlines()[linec])}\u001b[0m"
         )

@@ -293,7 +293,7 @@ def run(filename: str):
     prevfilecons = currentfilecons
     currentfilecons = slang_code
     try:
-        if slang_code == fread:
+        if slang_code == prevfilecons:
             raise Teenager()
     except NameError:
         pass

@@ -38,6 +38,10 @@ Open a PR. If you don't know how to do that uhhhhh
 
 [Read the first 2 sentences](#how-to-use). Slang will tell you if there's an update if you have internet and GitHub is up and isn't blocked.
 
+### The source code is newer than the release, what's that about?
+
+That is fucking development-stage code don't touch that you stupid bitch
+
 ### No standalone EXE (or whatever)?
 
 No EXE. Fuck you for even suggesting this. There is absolutely no future for Slang where this will be a thing. You really think there will ever be any. FUCK you. You want an EXE, you build it. Figure that out. Shithead.

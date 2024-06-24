@@ -1,4 +1,4 @@
-<p align="center"><img alt="Slang logo" src="https://raw.githubusercontent.com/Butterroach/slang/master/slang.png" /></p>
+<!--<p align="center"><img alt="Slang logo" src="https://raw.githubusercontent.com/Butterroach/slang/master/slang.png" /></p>
 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![Python application](https://github.com/Butterroach/slang/actions/workflows/python-app.yml/badge.svg)](https://github.com/Butterroach/slang/actions/workflows/python-app.yml)
 
@@ -48,4 +48,5 @@ No EXE. Fuck you for even suggesting this. There is absolutely no future for Sla
 
 ### Conclusion
 
-You shouldn't use this
+You shouldn't use this--->
+this is work in progres!!!!! jrgfjertiogjergijergijregtyytb56666666434kl;9

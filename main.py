@@ -1,5 +1,5 @@
 """
-    Slang -- A simple scripting language
+    Slash -- a poorly written shell
     Copyright (C) 2024  Butterroach
 
     This program is free software: you can redistribute it and/or modify
@@ -16,19 +16,24 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+import getpass
 import inspect
 import json
 import math
 import os
+import shutil
+import subprocess
 import sys
+import tercol
 import urllib.request
+from datetime import datetime
 from typing import Callable  # I LOVE TYPE HINTING I LOVE TYPE HINTING YES YES
 
 os.system("")
 
 linec = 0
 
-__version__ = "2.3.0-alpha"
+__version__ = "1.0.0-alpha"
 
 
 class SlangError(Exception):
@@ -37,7 +42,7 @@ class SlangError(Exception):
 
 class NoSuchFunction(SlangError):
     """
-    [msg] function does not exist
+    [msg] command does not exist
     """
 
 
@@ -136,11 +141,19 @@ def process_single_line(
         if line.startswith(function_name):
             wompwomp = False
             # print("function found!", function_name)
-            args: list[str] = split_args(line.replace(f"{function_name} ", "", 1))
+            args: list[str] = split_args(
+                line.replace(f"{function_name}", "", 1).replace(
+                    f"{function_name} ", "", 1
+                )
+                if line.replace(f"{function_name} ", "", 1) == line
+                else line.replace(f"{function_name} ", "", 1)
+            )  # this is so janky
             internalfunction = functions[i][1]
             # print("converting args to correct types")
             restannotate = None
             unannotatedargs = args.copy()
+            if not args:
+                return internalfunction()
             for i, annotate, argname in zip(
                 range(len(internalfunction.__annotations__.values())),
                 internalfunction.__annotations__.values(),
@@ -272,40 +285,44 @@ def define_var_fun(var_name: str, *var_value: str):
     )
 
 
-def slang_input(msg: str = None):
-    return input(msg)
+def ls(dir_name: str = None):
+    if dir_name is None:
+        items = os.scandir()
+    else:
+        items = os.scandir(os.path.abspath(dir_name))
+    for item in items:
+        try:
+            if item.is_dir():
+                print(
+                    f"{tercol.fadedout('[DIR]')} {item.name:64} {tercol.fadedout(datetime.fromtimestamp(os.path.getmtime(item)).strftime('%Y-%m-%d %H:%M:%S'))}"
+                )
+            else:
+                print(
+                    f"{tercol.fadedout('[FIL]')} {item.name:64} {tercol.fadedout(datetime.fromtimestamp(os.path.getmtime(item)).strftime('%Y-%m-%d %H:%M:%S'))}"
+                )
+        except FileNotFoundError:
+            # dirs/files with weird illegal names can cause this for some reason (i have one of those on my desktop and oh god it breaks everything)
+            continue
 
 
-def run(filename: str):
-    global linec, currentfile, currentfilecons
-    try:
-        with open(filename, "r") as f:
-            slang_code = f.read()
-    except PermissionError:
-        raise PermissionDenied(filename)
-    except FileNotFoundError:
-        raise FileNotFound(filename)
-    fileslines[filename] = 0
-    fileslines[currentfile] = linec
-    prevfile = currentfile
-    currentfile = filename
-    linec = fileslines[filename]
-    prevfilecons = currentfilecons
-    currentfilecons = slang_code
-    try:
-        if slang_code == prevfilecons:
-            raise Teenager()
-    except NameError:
-        pass
-    process_function_calls(slang_code, functions)
-    currentfile = prevfile
-    linec = fileslines[currentfile]
-    currentfilecons = prevfilecons
+def cat(file: str):
+    with open(file, "r") as f:
+        print(f.read())
 
 
-slang_vars = {}
+def cls():
+    # For Windows
+    if os.name == "nt":
+        os.system("cls")
+    # For Mac and Linux
+    else:
+        # THIS CODE IS REACHABLE! PYLANCE (VS CODE) IS JUST STUPID
+        os.system("clear")
+
+
+slang_vars = dict(os.environ)
 functions = [
-    ("print", slang_print, "Prints output."),
+    ("echo", slang_print, "Prints output to the console."),
     ("var str", define_var_str),
     ("var int", define_var_int),
     ("var float", define_var_float),
@@ -356,15 +373,30 @@ functions = [
         "GRAAAAAAAHHHHH ONLY SE STR PLASE LR ELSE I WILL KILL YOUPLEAS DONT EJIN THE TUN",
     ),
     (
-        "input",
-        slang_input,
-        "Reads input from stdin. Can take an argument specifying a message to display to the user.",
+        "$",
+        lambda: print(
+            *[f"{name} = {val}" for name, val in slang_vars.items()], sep="\n"
+        ),
+        "Prints every variable currently defined. Slash (by default) sets the list of variables to the current environment variables before executing.",
     ),
     (
-        "run",
-        run,
-        "Runs another Slang file. This can be used for functions AND modules at the same time. Variables are shared, so that's function parameters for ya. 3 birds with one stone.",
+        "ls",
+        ls,
+        "Lists out the contents of a directory. If no directory specified, it will default to the current working dir.",
     ),
+    (
+        "cd",
+        lambda dir: os.chdir(dir),
+        "Changes the current directory to a different one.",
+    ),
+    (
+        "pwd",
+        lambda: print(os.getcwd()),
+        "Prints the current working directory to console.",
+    ),
+    ("cat", cat, "Prints out the contents of the specified file."),
+    ("cls", cls, "Clears the screen."),
+    ("clear", cls),
 ]
 
 
@@ -374,16 +406,15 @@ def replace_error_msg(e: SlangError, code: str):
 
 if __name__ == "__main__":
     # probably good enough checker
-    # i didnt use requests because i grinded too hard on the zero dependency setup i cant lose it now
     try:
         with urllib.request.urlopen(
-            "https://api.github.com/repos/Butterroach/slang/releases/latest"
+            "https://api.github.com/repos/slashsh/slash/releases/latest"
         ) as resp:
             data = resp.read().decode("utf-8")
             release_data = json.loads(data)
             latest_ver = release_data["tag_name"]
             if __version__ != latest_ver:
-                print(f"There's a new version ({latest_ver}) available for Slang!")
+                print(f"There's a new version ({latest_ver}) available for Slash!")
                 print(f"You're currently on {__version__}. Please update.")
     except Exception as e:
         pass
@@ -398,7 +429,7 @@ if __name__ == "__main__" and (
 ):
     currentfile = "///SHELL"
     if "--shh" not in sys.argv and "-s" not in sys.argv:
-        print(f"Slang v{__version__}")
+        print(f"Slash v{__version__}")
         print()
         print(
             "This program is licensed under the GNU AGPL-v3 license (apparently I can't put it under the GPL now)."
@@ -407,35 +438,58 @@ if __name__ == "__main__" and (
             "You should have received a copy of the GNU Affero General Public License along with this program. If not, see https://www.gnu.org/licenses/"
         )
         print(
-            "You can use the --shh (or -s) argument to make this not appear when you start the interactive shell."
+            "You can use the --shh (or -s) argument to make this not appear on start."
         )
         print()
     while True:
-        code = input(">")
+        code = input(
+            f"""
+{tercol.hexa(0xff00,f"Slash v{__version__}")} | {tercol.hexa(0xc678dd,getpass.getuser())}
+{tercol.hexa(0x3b8eea,datetime.now().strftime("%c"))} | {tercol.hexa(0xffff00,os.getcwd())}{tercol.hexa(0xffff,"<")}"""
+        )
         try:
             process_function_calls(code, functions)
+        except NoSuchFunction as e:
+            args: list[str] = split_args(
+                code.replace(f"{code.split()[0]}", "", 1)
+                if code.replace(f"{code.split()[0]} ", "", 1) == code
+                else code.replace(f"{code.split()[0]} ", "", 1)
+            )  # this is so janky
+            try:
+                for i in range(len(args)):
+                    if args[i].startswith("$"):
+                        orig_var = args[i]
+                        args[i] = slang_vars.get(args[i].replace("$", ""))
+                        if args[i] is None:
+                            raise NoSuchVariable(orig_var)
+            except SlangError as f:
+                print(f"\u001b[31mERROR! {replace_error_msg(f, code)}\u001b[0m")
+            fullp = shutil.which(code.split()[0])
+            if fullp is None:
+                print(f"\u001b[31mERROR! {replace_error_msg(e, code)}\u001b[0m")
+                continue
+            try:
+                subprocess.run([fullp, *args])
+            except KeyboardInterrupt:
+                print("^C")
         except SlangError as e:
-            print(code)
             print(f"\u001b[31mERROR! {replace_error_msg(e, code)}\u001b[0m")
         except Exception as e:
             print(f"\u001b[31mUH OH! PYTHON ERROR!\t{type(e).__name__}: {e}\u001b[0m")
 
 
 if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "help":
-    print(f"Slang v{__version__}\n")
+    print(f"Slash v{__version__}\n")
     if len(sys.argv) < 3:
-        print("Slang is a simple scripting language written in Python by Butterroach.")
-        print(
-            "See the wiki at https://github.com/Butterroach/slang/wiki for more info.\n"
-        )
-        print("All Slang built-in functions and descriptions:\n")
+        print("Slash is a simple poorly made shell written in Python by Butterroach.")
+        print("All Slash built-in commands:\n")
         for func in functions:
             if len(func) == 3:
                 print(f"{func[0]}: {func[2]}")
     else:
         nya = [func[0] for func in functions]
         if sys.argv[2] not in nya:
-            print("That's not a built-in function!")
+            print("That's not a built-in command!")
             os._exit(2)
         i = nya.index(sys.argv[2])
         print(nya[i], end=": ")
@@ -445,30 +499,10 @@ if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "help":
                 os._exit(0)
             if nya[i] == "#":
                 print(
-                    "...Y'know, that's a comment... How'd you figure out that was a function anyway?"
+                    "...Y'know, that's a comment... How'd you figure out that was a command anyway?"
                 )
                 os._exit(0)
-            print("This function doesn't have a description.")
+            print("This command doesn't have a description.")
             os._exit(0)
         print(functions[i][2])
     os._exit(0)
-
-
-if __name__ == "__main__" and len(sys.argv) > 1:
-    currentfile = sys.argv[1]
-    try:
-        with open(sys.argv[1], "r") as f:
-            fread = f.read()
-    except FileNotFoundError:
-        print("that file doesn't exist dumbass")
-        os._exit(1)
-    currentfilecons = fread
-    try:
-        process_function_calls(fread, functions)
-    except SlangError as e:
-        print(
-            f"\u001b[1m\u001b[31mLINE {linec+1} IN {currentfile}: \u001b[0m\u001b[4m\u001b[32m{currentfilecons.splitlines()[linec]}\u001b[0m"
-        )
-        print(
-            f"\u001b[1m\u001b[31mERROR! {replace_error_msg(e, currentfilecons.splitlines()[linec])}\u001b[0m"
-        )

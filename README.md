@@ -49,4 +49,7 @@ No EXE. Fuck you for even suggesting this. There is absolutely no future for Sla
 ### Conclusion
 
 You shouldn't use this--->
+
 this is work in progres!!!!! jrgfjertiogjergijergijregtyytb56666666434kl;9
+
+(write readme later)

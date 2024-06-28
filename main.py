@@ -427,6 +427,7 @@ if __name__ == "__main__" and (
         and (sys.argv[1] in ("--shh", "-s") if len(sys.argv) > 1 else True)
     )
 ):
+    returncode = 0
     currentfile = "///SHELL"
     if "--shh" not in sys.argv and "-s" not in sys.argv:
         print(f"Slash v{__version__}")
@@ -444,11 +445,12 @@ if __name__ == "__main__" and (
     while True:
         code = input(
             f"""
-{tercol.hexa(0xff00,f"Slash v{__version__}")} | {tercol.hexa(0xc678dd,getpass.getuser())}
+{tercol.hexa((0xff00 if returncode == 0 else 0xff0000),f"Slash v{__version__} ({hex(returncode)[2:]})")} | {tercol.hexa(0xc678dd,getpass.getuser())}
 {tercol.hexa(0x3b8eea,datetime.now().strftime("%c"))} | {tercol.hexa(0xffff00,os.getcwd())}{tercol.hexa(0xffff,"<")}"""
         )
         try:
             process_function_calls(code, functions)
+            returncode = 0
         except NoSuchFunction as e:
             args: list[str] = split_args(
                 code.replace(f"{code.split()[0]}", "", 1)
@@ -464,18 +466,23 @@ if __name__ == "__main__" and (
                             raise NoSuchVariable(orig_var)
             except SlangError as f:
                 print(f"\u001b[31mERROR! {replace_error_msg(f, code)}\u001b[0m")
+                returncode = 1
             fullp = shutil.which(code.split()[0])
             if fullp is None:
                 print(f"\u001b[31mERROR! {replace_error_msg(e, code)}\u001b[0m")
+                returncode = 1
                 continue
             try:
-                subprocess.run([fullp, *args])
+                returncode = subprocess.run([fullp, *args]).returncode
             except KeyboardInterrupt:
                 print("^C")
+                returncode = 1
         except SlangError as e:
             print(f"\u001b[31mERROR! {replace_error_msg(e, code)}\u001b[0m")
+            returncode = 1
         except Exception as e:
             print(f"\u001b[31mUH OH! PYTHON ERROR!\t{type(e).__name__}: {e}\u001b[0m")
+            returncode = 1
 
 
 if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "help":

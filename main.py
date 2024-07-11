@@ -33,7 +33,9 @@ os.system("")
 
 linec = 0
 
-__version__ = "1.0.0-alpha"
+__version__ = "1.1.0-alpha"
+
+dollar_pua_sequence = "\ue290\ueaf3\ueff9"  # my technique here is to simply hope no one actually uses these
 
 
 class SlangError(Exception):
@@ -64,13 +66,10 @@ class PermissionDenied(SlangError):
     """
 
 
-class Teenager(SlangError):
+class HelpNoSuchFunction(SlangError):
     """
-    A script can't run itself
+    That's not a built-in command!
     """
-
-
-fileslines = {}
 
 
 def split_args(text):
@@ -103,8 +102,11 @@ def split_args(text):
             elif current_word:
                 words.append(current_word.strip('"'))
                 current_word = ""
+        elif char == "$" and escape_next:
+            current_word += dollar_pua_sequence
         else:
             current_word += char
+            escape_next = False
 
     if current_word:
         words.append(current_word.strip('"'))
@@ -184,6 +186,12 @@ def process_single_line(
                             raise NoSuchVariable(orig_var)
                     unannotatedargs[i] = restannotate(unannotatedargs[i])
                     i += 1
+            for i in range(len(args)):
+                args[i] = args[i].replace(dollar_pua_sequence, "$", 1)
+            for i in range(len(unannotatedargs)):
+                unannotatedargs[i] = unannotatedargs[i].replace(
+                    dollar_pua_sequence, "$", 1
+                )
             if unannotatedargs and args != unannotatedargs:  # how does this even happen
                 return internalfunction(*(args + unannotatedargs))
             return internalfunction(*args)
@@ -287,6 +295,7 @@ def define_var_fun(var_name: str, *var_value: str):
 
 def ls(dir_name: str = None):
     if dir_name is None:
+        # PYLANCE THIS SHIT IS REACHABLE FUCK YOU YOU'RE STUPID
         items = os.scandir()
     else:
         items = os.scandir(os.path.abspath(dir_name))
@@ -318,6 +327,53 @@ def cls():
     else:
         # THIS CODE IS REACHABLE! PYLANCE (VS CODE) IS JUST STUPID
         os.system("clear")
+
+
+def dollar(var: str = None):
+    # btw you can do $varname instead of $ varname that's a lil quirk of a """""fix""""" i did :3 gonna keep it cuz it's actually convenient
+    if var is None:
+        # THIS IS REACHABLE PYLANCE IS STUPID!!!!
+        print(*[f"{name} = {val}" for name, val in slang_vars.items()], sep="\n")
+    else:
+        var_content = slang_vars.get(var)
+        if var_content is None:
+            raise NoSuchVariable(var)
+        print(f"{var_content}")
+
+
+def help(command: str = None):
+    global returncode
+    print(f"Slash v{__version__}\n")
+    if command is None:
+        # pylance i hate you so much HOW IS THIS UNREACHABLE
+        print("Slash is a simple poorly made shell written in Python by Butterroach.")
+        print("All Slash built-in commands:\n")
+        for func in functions:
+            if len(func) == 3:
+                print(f"{func[0]}: {func[2]}")
+    else:
+        nya = [func[0] for func in functions]
+        if command not in nya:
+            raise HelpNoSuchFunction
+        i = nya.index(command)
+        print(nya[i], end=": ")
+        if len(functions[i]) != 3:
+            if nya[i].startswith("var"):
+                print("I'm pretty sure you'd know what that is?")
+                return
+            if nya[i] == "#":
+                print(
+                    "...Y'know, that's a comment... How'd you figure out that was a command anyway?"
+                )
+                return
+            if nya[i] == "clear":
+                print(
+                    'This is an alias for the cls command. Run "help cls" to see the description.'
+                )
+                return
+            print("This command doesn't have a description.")
+            return
+        print(functions[i][2])
 
 
 slang_vars = dict(os.environ)
@@ -374,10 +430,8 @@ functions = [
     ),
     (
         "$",
-        lambda: print(
-            *[f"{name} = {val}" for name, val in slang_vars.items()], sep="\n"
-        ),
-        "Prints every variable currently defined. Slash (by default) sets the list of variables to the current environment variables before executing.",
+        dollar,
+        "Prints every variable currently defined, or prints the contents of a specific variable if provided. Slash (by default) sets the list of variables to the current environment variables before executing.",
     ),
     (
         "ls",
@@ -397,6 +451,11 @@ functions = [
     ("cat", cat, "Prints out the contents of the specified file."),
     ("cls", cls, "Clears the screen."),
     ("clear", cls),
+    (
+        "help",
+        help,
+        "Displays a message showing every command available, or (if provided) shows the description for a specific command.",
+    ),
 ]
 
 
@@ -443,11 +502,17 @@ if __name__ == "__main__" and (
         )
         print()
     while True:
-        code = input(
-            f"""
+        try:
+            code = input(
+                f"""
 {tercol.hexa((0xff00 if returncode == 0 else 0xff0000),f"Slash v{__version__} ({hex(returncode)[2:]})")} | {tercol.hexa(0xc678dd,getpass.getuser())}
 {tercol.hexa(0x3b8eea,datetime.now().strftime("%c"))} | {tercol.hexa(0xffff00,os.getcwd())}{tercol.hexa(0xffff,"<")}"""
-        )
+            )
+        except KeyboardInterrupt:
+            returncode = 1
+            print("^C")
+            print('If you want to exit, just type in "exit".')
+            continue
         try:
             process_function_calls(code, functions)
             returncode = 0
@@ -464,16 +529,51 @@ if __name__ == "__main__" and (
                         args[i] = slang_vars.get(args[i].replace("$", ""))
                         if args[i] is None:
                             raise NoSuchVariable(orig_var)
+                for i in range(len(args)):
+                    args[i] = args[i].replace(dollar_pua_sequence, "$", 1)
             except SlangError as f:
                 print(f"\u001b[31mERROR! {replace_error_msg(f, code)}\u001b[0m")
                 returncode = 1
-            fullp = shutil.which(code.split()[0])
+                continue
+            command_name = code.split()[0]
+            exts = os.getenv("PATHEXT")
+            if exts is None:
+                exts = []
+            else:
+                exts = exts.split(os.pathsep)
+            fullp = shutil.which(command_name)
             if fullp is None:
                 print(f"\u001b[31mERROR! {replace_error_msg(e, code)}\u001b[0m")
                 returncode = 1
                 continue
             try:
                 returncode = subprocess.run([fullp, *args]).returncode
+            except OSError:
+                # shutil.which i hate you i hate you so much
+                fullp = None
+                i = 0
+                alltried = []
+                while fullp is None and i < len(exts):
+                    fullp = shutil.which(f"{command_name}{exts[i]}")
+                    alltried.append(fullp)
+                    i += 1
+                if fullp is None:
+                    print(f"\u001b[31mERROR! {replace_error_msg(e, code)}\u001b[0m")
+                    returncode = 1
+                    continue
+                try:
+                    returncode = subprocess.run([fullp, *args]).returncode
+                except OSError:
+                    print(
+                        "\u001b[31mERROR! There's something wrong here! Please open an issue on the GitHub repo (https://github.com/slashsh/slash) with a full screenshot of the command you typed in and this error."
+                    )
+                    print(
+                        f"shutil.which = {shutil.which(command_name)} pathext = {exts} pathsep = {os.pathsep} {alltried =} {fullp =} slang version = v{__version__}"
+                    )
+                    returncode = 0xDEADA55
+                    continue
+                except KeyboardInterrupt:
+                    returncode = 1
             except KeyboardInterrupt:
                 print("^C")
                 returncode = 1
@@ -486,30 +586,7 @@ if __name__ == "__main__" and (
 
 
 if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "help":
-    print(f"Slash v{__version__}\n")
-    if len(sys.argv) < 3:
-        print("Slash is a simple poorly made shell written in Python by Butterroach.")
-        print("All Slash built-in commands:\n")
-        for func in functions:
-            if len(func) == 3:
-                print(f"{func[0]}: {func[2]}")
+    if len(sys.argv) == 2:
+        help()
     else:
-        nya = [func[0] for func in functions]
-        if sys.argv[2] not in nya:
-            print("That's not a built-in command!")
-            os._exit(2)
-        i = nya.index(sys.argv[2])
-        print(nya[i], end=": ")
-        if len(functions[i]) != 3:
-            if nya[i].startswith("var"):
-                print("I'm pretty sure you'd know what that is?")
-                os._exit(0)
-            if nya[i] == "#":
-                print(
-                    "...Y'know, that's a comment... How'd you figure out that was a command anyway?"
-                )
-                os._exit(0)
-            print("This command doesn't have a description.")
-            os._exit(0)
-        print(functions[i][2])
-    os._exit(0)
+        help(sys.argv[2])

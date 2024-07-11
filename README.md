@@ -58,7 +58,7 @@ You shouldn't use this--->
 
 Slash is a shell written in pure Python with only one dependency (that's tercol which is something else i made woah epic self plug!!!!!)
 
-### How to use
+### How to download and start it
 
 Download the source code (zip or tar.gz, both are fine) from [here](https://github.com/slashsh/slash/releases/latest). Extract it. Then open your terminal and go into the new directory and install `tercol` using pip then run the main.py file with python. If you're too stupid to do that why are you even in a shell's readme
 
@@ -70,7 +70,7 @@ This is in alpha shithead (open an issue)
 
 uhh... you write commands
 
-Before you say anything fuck you just write the name of a silly lil shell program you have installed
+Before you say anything fuck you just write the name of a silly lil shell program you have installed or write `help` for a list of all the silly built-in commands
 
 ### How can I contribute
 

@@ -50,6 +50,52 @@ No EXE. Fuck you for even suggesting this. There is absolutely no future for Sla
 
 You shouldn't use this--->
 
-this is work in progres!!!!! jrgfjertiogjergijergijregtyytb56666666434kl;9
+# Slash
 
-(write readme later)
+## a poorly written shell
+
+---
+
+Slash is a shell written in pure Python with only one dependency (that's tercol which is something else i made woah epic self plug!!!!!)
+
+### How to use
+
+Download the source code (zip or tar.gz, both are fine) from [here](https://github.com/slashsh/slash/releases/latest). Extract it. Then open your terminal and go into the new directory and install `tercol` using pip then run the main.py file with python. If you're too stupid to do that why are you even in a shell's readme
+
+### It doesn't work
+
+This is in alpha shithead (open an issue)
+
+### Great, now how do I use this
+
+uhh... you write commands
+
+Before you say anything fuck you just write the name of a silly lil shell program you have installed
+
+### How can I contribute
+
+Open a PR. If you don't know how to do that uhhhhh
+
+### How do I update?
+
+[Read the first 2 sentences](#how-to-use). Slash will tell you if there's an update if you have internet and GitHub is up and isn't blocked.
+
+### The source code is newer than the release, what's that about?
+
+That is fucking development-stage code don't touch that you stupid bitch
+
+### No standalone EXE (or whatever)?
+
+Maybe
+
+### Conclusion
+
+You shouldn't use this
+
+### I'm having déjà vu...
+
+Yes this readme is copied straight off [Slang's](https://github.com/Butterroach/slang) fuck you
+
+### Why is the entirety of the Slang readme just put into a comment here
+
+I'm too lazy to get that off

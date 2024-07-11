@@ -1,13 +1,10 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-
 name: Python application
 
 on:
     push:
-        branches: ["gejroigjeiogj"]
+        branches: ["main"]
     pull_request:
-        branches: ["gjeiorjgioreujg"]
+        branches: ["main"]
 
 permissions:
     contents: read
@@ -33,7 +30,7 @@ jobs:
                   flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
                   # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
                   flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-            - name: Try to interpret test.sponge
+            - name: Try to run with the help argument
               run: |
-                  # this is like the pytest part i removed but it should only error if there's an actual issue
-                  python main.py test.sponge
+                  # yeah... i couldnt think of a substitute for slang's step here
+                  python main.py help

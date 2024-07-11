@@ -586,7 +586,10 @@ if __name__ == "__main__" and (
 
 
 if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "help":
-    if len(sys.argv) == 2:
-        help()
-    else:
-        help(sys.argv[2])
+    try:
+        if len(sys.argv) == 2:
+            help()
+        else:
+            help(sys.argv[2])
+    except SlangError as e:
+        print(f"\u001b[31mERROR! {replace_error_msg(e, "")}\u001b[0m")

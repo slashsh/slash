@@ -54,6 +54,8 @@ You shouldn't use this--->
 
 ## a poorly written shell
 
+[![Python application](https://github.com/slashsh/slash/actions/workflows/python-app.yml/badge.svg)](https://github.com/slashsh/slash/actions/workflows/python-app.yml)
+
 ---
 
 Slash is a shell written in pure Python with only one dependency (that's tercol which is something else i made woah epic self plug!!!!!)

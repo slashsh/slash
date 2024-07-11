@@ -86,7 +86,7 @@ That is fucking development-stage code don't touch that you stupid bitch
 
 ### No standalone EXE (or whatever)?
 
-Maybe
+Maybe in the future
 
 ### Conclusion
 

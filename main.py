@@ -33,7 +33,7 @@ os.system("")
 
 linec = 0
 
-__version__ = "1.1.1-alpha"
+__version__ = "1.2.0-alpha"
 
 dollar_pua_sequence = "\ue290\ueaf3\ueff9"  # my technique here is to simply hope no one actually uses these
 
@@ -57,6 +57,12 @@ class NoSuchVariable(SlangError):
 class FileNotFound(SlangError):
     """
     File [msg] doesn't exist
+    """
+
+
+class DirectoryNotFound(SlangError):
+    """
+    Directory [msg] doesn't exist
     """
 
 
@@ -376,6 +382,13 @@ def help(command: str = None):
         print(functions[i][2])
 
 
+def cd(dir: str):
+    try:
+        os.chdir(os.path.expanduser(dir))
+    except FileNotFoundError:
+        raise DirectoryNotFound(dir)
+
+
 slang_vars = dict(os.environ)
 functions = [
     ("echo", slang_print, "Prints output to the console."),
@@ -440,7 +453,7 @@ functions = [
     ),
     (
         "cd",
-        lambda dir: os.chdir(dir),
+        cd,
         "Changes the current directory to a different one.",
     ),
     (

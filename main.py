@@ -33,7 +33,7 @@ os.system("")
 
 linec = 0
 
-__version__ = "1.1.0-alpha"
+__version__ = "1.1.1-alpha"
 
 dollar_pua_sequence = "\ue290\ueaf3\ueff9"  # my technique here is to simply hope no one actually uses these
 
@@ -547,7 +547,7 @@ if __name__ == "__main__" and (
                 returncode = 1
                 continue
             try:
-                returncode = subprocess.run([fullp, *args]).returncode
+                returncode = subprocess.run([os.path.normpath(fullp), *args]).returncode
             except OSError:
                 # shutil.which i hate you i hate you so much
                 fullp = None
@@ -562,7 +562,7 @@ if __name__ == "__main__" and (
                     returncode = 1
                     continue
                 try:
-                    returncode = subprocess.run([fullp, *args]).returncode
+                    returncode = subprocess.run([os.path.normpath(fullp), *args]).returncode
                 except OSError:
                     print(
                         "\u001b[31mERROR! There's something wrong here! Please open an issue on the GitHub repo (https://github.com/slashsh/slash) with a full screenshot of the command you typed in and this error."

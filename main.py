@@ -562,7 +562,9 @@ if __name__ == "__main__" and (
                     returncode = 1
                     continue
                 try:
-                    returncode = subprocess.run([os.path.normpath(fullp), *args]).returncode
+                    returncode = subprocess.run(
+                        [os.path.normpath(fullp), *args]
+                    ).returncode
                 except OSError:
                     print(
                         "\u001b[31mERROR! There's something wrong here! Please open an issue on the GitHub repo (https://github.com/slashsh/slash) with a full screenshot of the command you typed in and this error."
@@ -592,4 +594,4 @@ if __name__ == "__main__" and len(sys.argv) > 1 and sys.argv[1] == "help":
         else:
             help(sys.argv[2])
     except SlangError as e:
-        print(f"\u001b[31mERROR! {replace_error_msg(e, "")}\u001b[0m")
+        print(f"\u001b[31mERROR! {replace_error_msg(e, " ")}\u001b[0m")

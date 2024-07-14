@@ -33,7 +33,7 @@ os.system("")
 
 linec = 0
 
-__version__ = "1.2.0-alpha"
+__version__ = "1.2.1-alpha"
 
 dollar_pua_sequence = "\ue290\ueaf3\ueff9"  # my technique here is to simply hope no one actually uses these
 
@@ -176,6 +176,7 @@ def process_single_line(
                     args[i] = slang_vars.get(args[i].replace("$", ""))
                     if args[i] is None:
                         raise NoSuchVariable(orig_var)
+                args[i] = args[i].replace(dollar_pua_sequence, "$", 1)
                 args[i] = annotate(args[i])
                 unannotatedargs.pop(0)
                 # print(f"converted to {type(args[i])} successfully!")
@@ -190,14 +191,9 @@ def process_single_line(
                         )
                         if unannotatedargs[i] is None:
                             raise NoSuchVariable(orig_var)
+                    args[i] = args[i].replace(dollar_pua_sequence, "$", 1)
                     unannotatedargs[i] = restannotate(unannotatedargs[i])
                     i += 1
-            for i in range(len(args)):
-                args[i] = args[i].replace(dollar_pua_sequence, "$", 1)
-            for i in range(len(unannotatedargs)):
-                unannotatedargs[i] = unannotatedargs[i].replace(
-                    dollar_pua_sequence, "$", 1
-                )
             if unannotatedargs and args != unannotatedargs:  # how does this even happen
                 return internalfunction(*(args + unannotatedargs))
             return internalfunction(*args)
